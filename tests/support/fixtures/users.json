@@ -1,0 +1,12 @@
+
+{
+  "admin": {
+    "username": "standard_user",
+    "password": "secret_sauce"
+  },
+
+  "wrong":{
+    "username": "wrong_user",
+    "password": "wrong_password"
+  }
+}
