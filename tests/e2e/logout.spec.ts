@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { Login } from '../support/actions/Login';
 import { admin } from '../support/fixtures/users.json';
 
