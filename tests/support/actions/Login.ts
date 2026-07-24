@@ -7,22 +7,18 @@ export class Login {
         this.page = page
     }
 
-    async visit() {
+    async login(email: string, password: string) {
         await this.page.goto('/')
         const loginForm = this.page.locator('.login-box > form')
         await expect(loginForm).toBeVisible()
-    }
-
-    async submit(email: string, password: string) {
         await this.page.getByPlaceholder('Username').fill(email)
         await this.page.getByPlaceholder('Password').fill(password)
         await this.page.getByTestId('login-button').click()
-
     }
 
-    async isLoggedIn() {
+   async IsLoggedIn(){
         await expect(this.page).toHaveURL('/inventory.html');
-    }
+   }
 
     async alertHaveText(text: string) {
         const alert = this.page.locator('.error-message-container');

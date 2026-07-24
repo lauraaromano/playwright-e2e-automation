@@ -1,66 +1,42 @@
 import { test } from '@playwright/test';
-import { Login } from '../support/actions/Login';
-import { admin, wrong, blocked } from '../support/fixtures/users.json';
+import { Login, admin, wrong, blocked } from '../support/index';
 
-test('deve realizar login com credenciais válidas', async ({page}) => {
-    const login = new Login(page);
+let login: Login;
 
-    await login.visit()
-    await login.submit(admin.username, admin.password)
-    await login.isLoggedIn()
-})
+test.beforeEach(async ({ page }) => {
+    login = new Login(page);
+});
 
-test('não deve realizar login com os campos de usuário e senha vazios', async ({page}) => {
-    const login = new Login(page);
+test('deve realizar login com credenciais válidas', async () => {
+    await login.login(admin.username, admin.password);
+});
 
-    await login.visit()
-    await page.getByTestId('login-button').click()
+test('não deve realizar login com os campos de usuário e senha vazios', async () => {
+    await login.login('', '');
+    await login.alertHaveText('Epic sadface: Username is required');
+});
 
-    await login.alertHaveText('Epic sadface: Username is required')
-    
-})
+test('não deve realizar login com usuário válido e senha inválida', async () => {
+    await login.login(admin.username, wrong.password);
+    await login.alertHaveText('Epic sadface: Username and password do not match any user in this service');
+});
 
-test('não deve realizar login com usuário válido e senha inválida', async ({page}) =>{
-   const login = new Login(page);
+test('não deve realizar login com usuário inválido e senha válida', async () => {
+    await login.login(wrong.username, admin.password);
+    await login.alertHaveText('Epic sadface: Username and password do not match any user in this service');
+});
 
-    await login.visit()
-    await login.submit(admin.username, wrong.password)
+test('não deve realizar login quando o campo de usuário estiver vazio', async () => {
+    await login.login('', admin.password);
+    await login.alertHaveText('Epic sadface: Username is required');
+});
 
-    await login.alertHaveText('Epic sadface: Username and password do not match any user in this service')
-})
+test('não deve realizar login quando o campo de senha estiver vazio', async () => {
+    await login.login(admin.username, '');
+    await login.alertHaveText('Epic sadface: Password is required');
+});
 
-test('não deve realizar login com usuário inválido e senha válida', async ({page}) =>{
-   const login = new Login(page);
-
-    await login.visit()
-    await login.submit(wrong.username,admin.password)
-
-    await login.alertHaveText('Epic sadface: Username and password do not match any user in this service')
-})
-
-test('não deve realizar login quando o campo de usuário estiver vazio', async ({page}) =>{
-   const login = new Login(page);
-
-    await login.visit()
-    await login.submit('',admin.password)
-
-    await login.alertHaveText('Epic sadface: Username is required')
-})
-
-test('não deve realizar login quando o campo de senha estiver vazio', async ({page}) =>{
-   const login = new Login(page);
-
-    await login.visit()
-    await login.submit(admin.username,'')
-
-    await login.alertHaveText('Epic sadface: Password is required')
-})
-
-test('não deve realizar login com um usuário bloqueado', async ({page}) =>{
-   const login = new Login(page);
-
-    await login.visit()
-    await login.submit(blocked.username,blocked.password)
-
-    await login.alertHaveText('Epic sadface: Sorry, this user has been locked out.')
-})
+test('não deve realizar login com um usuário bloqueado', async () => {
+    await login.login(blocked.username, blocked.password);
+    await login.alertHaveText('Epic sadface: Sorry, this user has been locked out.');
+});

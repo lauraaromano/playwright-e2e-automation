@@ -1,65 +1,41 @@
 import { test } from '@playwright/test';
-import { Login } from '../support/actions/Login';
-import { Inventory } from '../support/actions/Inventory';
-import { admin } from '../support/fixtures/users.json';
+import { Login, Inventory, admin } from '../support/index';
 
-test('deve ordenar produtos de A a Z', async ({ page }) => {
-    const login = new Login(page);
-    const inventory = new Inventory(page);
+let login: Login;
+let inventory: Inventory;
 
-    await login.visit();
-    await login.submit(admin.username, admin.password);
-    await login.isLoggedIn();
+test.beforeEach(async ({ page }) => {
+    login = new Login(page);
+    inventory = new Inventory(page);
 
+    await login.login(admin.username, admin.password);
+    await login.IsLoggedIn();
+});
+
+test('deve ordenar produtos de A a Z', async () => {
     await inventory.filter("Name (A to Z)");
 
     await inventory.getProductNames();
     await inventory.getProductNamesInAZOrder();
-
 });
 
-test('deve ordenar produtos de Z a A', async ({ page }) => {
-    const login = new Login(page);
-    const inventory = new Inventory(page);
-
-    await login.visit();
-    await login.submit(admin.username, admin.password);
-    await login.isLoggedIn();
-
+test('deve ordenar produtos de Z a A', async () => {
     await inventory.filter("Name (Z to A)");
 
     await inventory.getProductNames();
     await inventory.getProductNamesInZAOrder();
-
 });
 
-test('deve ordenar produtos de preço mais barato ao mais caro', async ({ page }) => {
-    const login = new Login(page);
-    const inventory = new Inventory(page);
-
-    await login.visit();
-    await login.submit(admin.username, admin.password);
-    await login.isLoggedIn();
-
+test('deve ordenar produtos de preço mais barato ao mais caro', async () => {
     await inventory.filter("Price (low to high)");
 
     await inventory.getProductPrices();
     await inventory.getProductPricesLowToHighOrder();
-
 });
 
-test('deve ordenar produtos de preço mais caro ao mais barato', async ({ page }) => {
-    const login = new Login(page);
-    const inventory = new Inventory(page);
-
-    await login.visit();
-    await login.submit(admin.username, admin.password);
-    await login.isLoggedIn();
-
+test('deve ordenar produtos de preço mais caro ao mais barato', async () => {
     await inventory.filter("Price (high to low)");
 
     await inventory.getProductPrices();
     await inventory.getProductPricesHighToLowOrder();
-
 });
-
